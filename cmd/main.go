@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"golang.org/x/net/html"
+	"golang.org/x/net/html/charset"
 
 	"github.com/Ilya-Q/home24-test/internal/analyze"
 	"github.com/Ilya-Q/home24-test/internal/check"
@@ -22,8 +23,9 @@ func TestHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	target, _ := http.Get(string(url))
+	bodyReader, _ := charset.NewReader(target.Body, target.Header.Get("Content-Type"))
 
-	root, _ := html.Parse(target.Body)
+	root, _ := html.Parse(bodyReader)
 	ex := new(analyze.LinkExtractor)
 	visitors := []analyze.HTMLVisitor{
 		new(analyze.TitleGetter),
