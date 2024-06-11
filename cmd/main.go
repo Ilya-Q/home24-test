@@ -22,11 +22,12 @@ func TestHandler(w http.ResponseWriter, r *http.Request) {
 	target, _ := http.Get(string(url))
 
 	root, _ := html.Parse(target.Body)
-
 	visitors := []analyze.HTMLVisitor{
 		new(analyze.TitleGetter),
 		new(analyze.DoctypeGetter),
 		new(analyze.HeadingCounter),
+		new(analyze.LinkExtractor),
+		new(analyze.LoginFormDetector),
 	}
 	analyze.Walk(root, visitors)
 	for _, v := range visitors {

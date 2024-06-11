@@ -83,3 +83,35 @@ func (v *HeadingCounter) Visit(node *html.Node) bool {
 	}
 	return false
 }
+
+type LinkExtractor struct {
+	Links []string
+}
+
+func (v *LinkExtractor) Visit(node *html.Node) bool {
+	if node.DataAtom == atom.A {
+		for _, a := range node.Attr {
+			if a.Key == "href" {
+				v.Links = append(v.Links, a.Val)
+				break
+			}
+		}
+	}
+	return false
+}
+
+type LoginFormDetector struct {
+	LoginFormFound bool
+}
+
+func (v *LoginFormDetector) Visit(node *html.Node) bool {
+	if node.DataAtom == atom.Input {
+		for _, a := range node.Attr {
+			if a.Key == "type" && a.Val == "password" {
+				v.LoginFormFound = true
+				return true
+			}
+		}
+	}
+	return false
+}
