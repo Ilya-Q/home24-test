@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"html/template"
+	"mime"
 	"net/http"
 
 	"github.com/Ilya-Q/home24-test/internal/analyze"
@@ -47,11 +48,32 @@ func AnalysisFormHandler(w http.ResponseWriter, r *http.Request) {
 		)
 		return
 	}
+
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		writeError(w,
 			http.StatusBadRequest, // Not sure if this is really a 400
-			fmt.Sprintf("URL not reachable: %v", err),
+			fmt.Sprintf("URL '%s' not reachable: %v", url, err),
+		)
+		return
+	}
+
+	contentType, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+	if err != nil {
+		writeError(w,
+			http.StatusBadRequest,
+			fmt.Sprintf("URL '%s' returned an invalid Content-Type '%s': %v",
+				url,
+				resp.Header.Get("Content-Type"),
+				err,
+			),
+		)
+		return
+	}
+	if contentType != "text/html" {
+		writeError(w,
+			http.StatusBadRequest,
+			fmt.Sprintf("URL '%s' does not point to an HTML resource", url),
 		)
 		return
 	}
@@ -64,11 +86,12 @@ func AnalysisFormHandler(w http.ResponseWriter, r *http.Request) {
 		)
 		return
 	}
+
 	root, err := html.Parse(br)
 	if err != nil {
 		writeError(w,
 			http.StatusBadRequest,
-			fmt.Sprintf("URL does not point at valid HTML: %v", err),
+			fmt.Sprintf("HTML could not be parsed: %v", err),
 		)
 		return
 	}

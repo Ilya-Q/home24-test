@@ -8,6 +8,8 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
+
+	"github.com/spf13/viper"
 )
 
 type LinkCounts struct {
@@ -45,6 +47,9 @@ func CheckLinks(ctx context.Context, baseUrl *url.URL, links []string) LinkCount
 
 	var inaccessible atomic.Uint64
 	var wg sync.WaitGroup
+	client := &http.Client{
+		Timeout: viper.GetDuration("timeout"),
+	}
 	for l, c := range deduped {
 		wg.Add(1)
 		go func() {
@@ -57,7 +62,7 @@ func CheckLinks(ctx context.Context, baseUrl *url.URL, links []string) LinkCount
 				inaccessible.Add(c)
 				return
 			}
-			resp, err := http.DefaultClient.Do(req)
+			resp, err := client.Do(req)
 			if err != nil {
 				log.Printf("GET failed for '%s': %v", l, err)
 				inaccessible.Add(c)
