@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Website Analysis Results</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="text-center mb-4">Website Analysis Results</h1>
+
+    <div id="results"> 
+
+      <h2>Analyzed URL: <span id="analyzedUrl">{{.URL}}</span></h2>
+
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <th>Page DOCTYPE:</th>
+            <td id="DOCTYPE">{{.Doctype}}</td>
+          </tr>
+          <tr>
+            <th>Page Title:</th>
+            <td id="pageTitle">{{.Title}}</td>
+          </tr>
+          <tr>
+            <th>Heading Levels and Counts:</th>
+            <td id="headingLevels">h1: {{.HeadingCounts.H1}} h2: {{.HeadingCounts.H2}} h3: {{.HeadingCounts.H3}} h4: {{.HeadingCounts.H4}} h5: {{.HeadingCounts.H5}} h6: {{.HeadingCounts.H6}}</td>
+          </tr>
+          <tr>
+            <th>Internal Links:</th>
+            <td id="internalLinks"> {{.LinkCounts.InternalLinks}}</td>
+          </tr>
+          <tr>
+            <th>External Links:</th>
+            <td id="externalLinks">{{.LinkCounts.ExternalLinks}}</td>
+          </tr>
+          <tr>
+            <th>Inaccessible Links:</th>
+            <td id="inaccessibleLinks">{{.LinkCounts.InaccessibleLinks}}</td>
+          </tr>
+          <tr>
+            <th>Login Form:</th>
+            <td id="loginForm">{{.HasLoginForm}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+
+  </div>
+
+</body>
+</html>

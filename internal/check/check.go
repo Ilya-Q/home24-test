@@ -51,7 +51,7 @@ func CheckLinks(ctx context.Context, baseUrl *url.URL, links []string) LinkCount
 			defer wg.Done()
 			// it's okay to capture l and c in this closure
 			// because Go finally fixed the loop variable gotcha in 1.22
-			req, err := http.NewRequestWithContext(ctx, "GET", l, nil)
+			req, err := http.NewRequestWithContext(ctx, http.MethodGet, l, nil)
 			if err != nil {
 				log.Printf("Couldn't create request for '%s': %v", l, err)
 				inaccessible.Add(c)

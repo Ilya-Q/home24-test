@@ -1,54 +1,18 @@
 package main
 
 import (
-	"fmt"
-	"io"
-	"log"
 	"net/http"
 
-	"golang.org/x/net/html"
-	"golang.org/x/net/html/charset"
-
-	"github.com/Ilya-Q/home24-test/internal/analyze"
-	"github.com/Ilya-Q/home24-test/internal/check"
+	"github.com/Ilya-Q/home24-test/internal/handlers"
 	"github.com/gorilla/mux"
 )
 
-func TestHandler(w http.ResponseWriter, r *http.Request) {
-	url, err := io.ReadAll(r.Body)
-
-	if err != nil {
-		fmt.Fprintf(w, "%v\n", err)
-		return
-	}
-
-	target, _ := http.Get(string(url))
-	bodyReader, _ := charset.NewReader(target.Body, target.Header.Get("Content-Type"))
-
-	root, _ := html.Parse(bodyReader)
-	ex := new(analyze.LinkExtractor)
-	visitors := []analyze.HTMLVisitor{
-		new(analyze.TitleGetter),
-		new(analyze.DoctypeGetter),
-		new(analyze.HeadingCounter),
-		ex,
-		new(analyze.LoginFormDetector),
-	}
-	analyze.Walk(root, visitors)
-	for _, v := range visitors {
-		fmt.Fprintf(w, "%+v\n", v)
-	}
-	log.Printf("Base URL: %v", target.Request.URL)
-	fmt.Fprintf(w, "%+v\n", check.CheckLinks(
-		r.Context(),
-		target.Request.URL,
-		ex.Links,
-	))
-}
-
 func main() {
 	r := mux.NewRouter()
-	r.HandleFunc("/", TestHandler)
+	r.HandleFunc("/", handlers.IndexHandler).Methods("GET")
+	r.HandleFunc("/", handlers.AnalysisFormHandler).Methods("POST")
+	r.NotFoundHandler = http.HandlerFunc(handlers.NotFoundHandler)
+	r.MethodNotAllowedHandler = http.HandlerFunc(handlers.NotFoundHandler)
 
 	http.ListenAndServe("localhost:8080", r)
 }
